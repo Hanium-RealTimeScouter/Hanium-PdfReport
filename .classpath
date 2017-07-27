@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/이성준/workspace/Hanium-PdfReport/lib/activation-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/이성준/workspace/Hanium-PdfReport/lib/commons-email-1.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/이성준/workspace/Hanium-PdfReport/lib/itext5-itextpdf-5.5.11.jar"/>
+	<classpathentry kind="lib" path="C:/Users/이성준/workspace/Hanium-PdfReport/lib/itext5-xmlworker-5.5.11.jar"/>
+	<classpathentry kind="lib" path="C:/Users/이성준/workspace/Hanium-PdfReport/lib/javax.mail-1.5.2.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
