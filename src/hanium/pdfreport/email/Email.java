@@ -22,7 +22,7 @@ public class Email {
 			email.setHostName("smtp.gmail.com");
 			email.setSmtpPort(587);
 			email.setStartTLSEnabled(true);
-	        email.setAuthenticator(new DefaultAuthenticator("haniumscouter@gmail.com", "dkqorhvk!@#$"));
+	        email.setAuthenticator(new DefaultAuthenticator("haniumscouter@gmail.com", "비밀번호"));
 	        email.setFrom("haniumscouter@gmail.com");
 	        email.setSubject("Hanium PDF Report");
 	        email.setMsg(String.format("[%s] Hanium PDF Report\n", 
