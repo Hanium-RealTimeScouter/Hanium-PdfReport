@@ -18,6 +18,6 @@ SCOUTER는 오픈소스 APM 도구로서 Java, WAS에 대한 모니터링 모니
    - 서비스의 시간대별 request  현황 -> 서비스의 들어오는 request를 시간대 별로 분석해 막대 그래프로 나타낸다.
 
 
- - 모니터링 대상 (TOBE)
+ -  추후에 보고서에 추가 될 내용(TOBE)
    - Thread 분석(Thread가 생성되어 사라지는 시간을 시각화하여 Thread의 Dead Lock현상등을 발견 할 수 있게 한다.)
 
