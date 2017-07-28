@@ -5,9 +5,6 @@
 ## Hanium-PdfReport
 SCOUTER는 오픈소스 APM 도구로서 Java, WAS에 대한 모니터링 모니터링 기능을 제공하며 이 모듈은 Scouter Agent 모듈에서 수집하는 Data를 Format화 된 형태의 보고서화 하며, 이를 주 사용자에게 주기적으로 전송하기 위한다.
 
- - **APM** : Application performance montoring / application performance management
-
-기업용 IT는 상용 서비스를 기반으로 진화하여 왔다. 그러나 이제는 점점 더 오픈 소스 기반의 시스템 구축이 늘어나고 있다. 오픈소스 기반의 시스템을 구축할때 성능 관리 또한 같이 고려 되어야하는데 오픈 소스인 Scouter는 가장 훌륭한 선택이 될 것이다.
 
 -구현 되어야 하는 기능 2017-07-28
 1) Scouter가 수집하는 data중 보고서에 필요한 data를 수집하기.
