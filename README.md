@@ -1,6 +1,6 @@
 # Hanium-PdfReport (2017-07-28)
 한이음 스카우터 프로젝트 PDF 생성 및 메일 전송 모듈
-
+![Screen](./doc/uml_2017_07_28.jpg)
 
 ## Hanium-PdfReport
 SCOUTER는 오픈소스 APM 도구로서 Java, WAS에 대한 모니터링 모니터링 기능을 제공하며 이 모듈은 Scouter Agent 모듈에서 수집하는 Data를 Format화 된 형태의 보고서화 하며, 이를 주 사용자에게 주기적으로 전송하기 위한다.
