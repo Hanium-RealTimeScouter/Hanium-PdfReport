@@ -20,13 +20,14 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
+
+import hanium.pdfreport.util.*;
+import scouter.server.Logger;
+
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Image;
 
-import hanium.pdfreport.util.*;
 
-
-@SuppressWarnings("unused")
 public class PdfReport {
 	/* 사용할 폰트 */
 	private static Font kor10, kor10Red, kor15, kor15Red, kor20, kor20Red;
@@ -35,6 +36,9 @@ public class PdfReport {
 	 * 생성자에서 폰트 생성 & 데이터 폴더 생성
 	 */
 	public PdfReport() {
+		
+		Logger.println("PdfReport 생성자 맨 위");
+		System.out.println("PdfReport 생성자 맨 위");
 		
 		try {
 			/* 데이터 폴더 없을 시 자동 생성 */
@@ -58,7 +62,7 @@ public class PdfReport {
 	 * 보고서 생성 메서드.
 	 * @return 생성 성공시 true, 실패시 false
 	 */
-	public boolean createPdfReport() {
+	public synchronized boolean createPdfReport() {
 		boolean isSuccess = true;
 		
 		try {
@@ -132,7 +136,7 @@ public class PdfReport {
 	 * @return 생성된 챕터 객체
 	 * @throws Exception
 	 */
-	private Chapter makeChapter(Document document, int chapterNum) throws Exception {
+	public Chapter makeChapter(Document document, int chapterNum) throws Exception {
 		String title = null, text = null;
 		Image image = null;
 
@@ -162,7 +166,7 @@ public class PdfReport {
 	 * @return 생성된 챕터
 	 * @throws Exception
 	 */
-	private Chapter makeChapter(Document document, int chapterNum, String title, Image image, String text) throws Exception {
+	public Chapter makeChapter(Document document, int chapterNum, String title, Image image, String text) throws Exception {
 		Chapter chapter = null;
 		
 		/* 챕터 삽입 */
@@ -186,7 +190,7 @@ public class PdfReport {
 	 * @param path text3.txt등의 부연설명 파일이 저장된 경로
 	 * @return 읽어들인 내용의 스트링
 	 */
-	private String readText(String path) {
+	public synchronized String readText(String path) {
 		StringBuilder contents = new StringBuilder();
 		try {
 			FileInputStream fis = new FileInputStream(path);
@@ -212,7 +216,7 @@ public class PdfReport {
 	 * @param document 전체 문서 객체
 	 * @param image 이미지 객체
 	 */
-	private void setImageSize(Document document, Image image){
+	public synchronized void setImageSize(Document document, Image image){
 		float imgHeight = image.getHeight(), imgWidth = image.getWidth();
 	    float docHeight = document.getPageSize().getHeight(), docWidth = document.getPageSize().getWidth();
 	    image.setAlignment(Element.ALIGN_CENTER);
@@ -226,7 +230,7 @@ public class PdfReport {
 	 * 우선 문서를 1차적으로 저장한 뒤, 다시 읽어들여서 각 페이지마다 백그라운드 이미지를 레이어 구조로 삽입
 	 * @param path 원본 문서 이름을 포함한 경로 ex) haniumPdfReport/[20170721] Scouter Report.pdf
 	 */
-	private void insertStamp(String path) {
+	public synchronized void insertStamp(String path) {
 		try {
 			String tmpPath = Util.DATA_PATH + "tmp.pdf";
 			File originFile = new File(path);
@@ -257,6 +261,31 @@ public class PdfReport {
 		catch(Exception e) {
 			e.printStackTrace();
 			System.err.println("Watermark Stamping Fail!");
+		}
+	}
+	
+	/**
+	 * 메일 보낸 뒤 PDF파일 및 PDF 파일 생성에 사용됬던 자료들을 삭제하는 메서드
+	 */
+	public synchronized void deleteAllData() {
+		//DATA_PATH 내부의 모든 파일들을 가져옴
+		File dataPathFile[] = new File(Util.DATA_PATH).listFiles();
+		File renamed = null;
+		String fileName = null;
+		
+		for(File each : dataPathFile) {
+			try {
+				fileName = each.getName();
+				
+				renamed = new File(String.format("(OLD)%s", fileName));
+				renamed.createNewFile();
+				
+				each.renameTo(renamed);
+				//each.delete();
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

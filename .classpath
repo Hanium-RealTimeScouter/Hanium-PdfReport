@@ -7,5 +7,7 @@
 	<classpathentry kind="lib" path="C:/Users/이성준/workspace/Hanium-PdfReport/lib/itext5-itextpdf-5.5.11.jar"/>
 	<classpathentry kind="lib" path="C:/Users/이성준/workspace/Hanium-PdfReport/lib/itext5-xmlworker-5.5.11.jar"/>
 	<classpathentry kind="lib" path="C:/Users/이성준/workspace/Hanium-PdfReport/lib/javax.mail-1.5.2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/scouter.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/scouter.server"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
