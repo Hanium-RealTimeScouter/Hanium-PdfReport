@@ -18,7 +18,7 @@ SCOUTER는 오픈소스 APM 도구로서 Java, WAS에 대한 모니터링 모니
  - 보고서에 포함 되어야 하는 내용 (현재)
    - Bad Query top 10 -> 웹 서비스에 있어서 transaction 처리에 있어 가장 안 좋은 response time을 갖는 query들의 list를 나타낸다.
    - 페이지 별 response time의 변화 추이 -> 페이지 별로 response time을 알 수 있는 Scouter의 기능을 활용해 서버에 안 좋은 영향을 끼칠 수 있는 response를 보이고 있는 페이지의 response time의 변화 추이를 꺾은 선 그래프로 나타낸다.
-- 서비스의 시간대별 request  현황 -> 서비스의 들어오는 request를 시간대 별로 분석해 막대 그래프로 나타낸다.
+   - 서비스의 시간대별 request  현황 -> 서비스의 들어오는 request를 시간대 별로 분석해 막대 그래프로 나타낸다.
 
 
  - 모니터링 대상 (TOBE)
