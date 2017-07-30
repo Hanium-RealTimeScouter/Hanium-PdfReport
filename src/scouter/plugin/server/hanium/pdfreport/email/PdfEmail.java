@@ -45,11 +45,11 @@ public class PdfEmail {
 					public void run() {
 						
 						/* PDF 생성 및 메일 전송 관련
-						 * 1일: 86400
-						 * 7일: 604800
-						 * 30일: 2592000
+						 * 1일: 86400000
+						 * 7일: 604800000
+						 * 30일: 2592000000
 						 */
-						long sendPeriod = conf.getLong("ext_plugin_email_send_pdf_period", 86400);
+						long sendPeriod = conf.getLong("ext_plugin_email_send_pdf_period", 86400000);
 						
 						long curTime = System.currentTimeMillis();
 						long elapsedTime = curTime - sendPeriod;

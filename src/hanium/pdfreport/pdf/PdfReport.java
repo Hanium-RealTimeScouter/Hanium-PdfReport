@@ -61,7 +61,7 @@ public class PdfReport {
 	 * 보고서 생성 메서드.
 	 * @return 생성 성공시 true, 실패시 false
 	 */
-	public boolean createPdfReport() {
+	public synchronized boolean createPdfReport() {
 		
 		boolean isSuccess = true;
 		
@@ -113,7 +113,7 @@ public class PdfReport {
 			Logger.println("Document Created at "+ Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
 			
 			/* PDF 파일에 워터마크 삽입 */
-			insertStamp(Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
+			//insertStamp(Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
 			
 		}
 		catch(Exception e) {
