@@ -37,9 +37,6 @@ public class PdfReport {
 	 */
 	public PdfReport() {
 		
-		Logger.println("PdfReport 생성자 맨 위");
-		System.out.println("PdfReport 생성자 맨 위");
-		
 		try {
 			/* 데이터 폴더 없을 시 자동 생성 */
 			new File(Util.DATA_PATH).mkdirs();
@@ -55,6 +52,8 @@ public class PdfReport {
 		}
 		catch(Exception e) {
 			e.printStackTrace();
+
+			e.printStackTrace(Logger.pw());
 		}
 	}
 	
@@ -62,13 +61,15 @@ public class PdfReport {
 	 * 보고서 생성 메서드.
 	 * @return 생성 성공시 true, 실패시 false
 	 */
-	public synchronized boolean createPdfReport() {
+	public boolean createPdfReport() {
+		
 		boolean isSuccess = true;
 		
 		try {
 			/* 기초적인 PDF 생성 */
+			FileOutputStream fos = new FileOutputStream(Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
 			Document document = new Document(PageSize.A4, 30, 30, 30, 30);
-			PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(Util.DATA_PATH + Util.REPORT_NAME + ".pdf"));
+			PdfWriter writer = PdfWriter.getInstance(document, fos);
 		    document.open();
 		    
 		    document.addAuthor("author_occidere");
@@ -106,9 +107,10 @@ public class PdfReport {
 			
 			document.close();//문서 닫기
 			writer.close();
+			fos.close();
 		
 			System.out.println("Document Created!");
-			
+			Logger.println("Document Created at "+ Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
 			
 			/* PDF 파일에 워터마크 삽입 */
 			insertStamp(Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
@@ -117,6 +119,8 @@ public class PdfReport {
 		catch(Exception e) {
 			isSuccess = false;
 			e.printStackTrace();
+			
+			e.printStackTrace(Logger.pw());
 		}
 		
 		return isSuccess;
@@ -137,6 +141,7 @@ public class PdfReport {
 	 * @throws Exception
 	 */
 	public Chapter makeChapter(Document document, int chapterNum) throws Exception {
+		
 		String title = null, text = null;
 		Image image = null;
 
@@ -167,6 +172,7 @@ public class PdfReport {
 	 * @throws Exception
 	 */
 	public Chapter makeChapter(Document document, int chapterNum, String title, Image image, String text) throws Exception {
+		
 		Chapter chapter = null;
 		
 		/* 챕터 삽입 */
@@ -190,7 +196,8 @@ public class PdfReport {
 	 * @param path text3.txt등의 부연설명 파일이 저장된 경로
 	 * @return 읽어들인 내용의 스트링
 	 */
-	public synchronized String readText(String path) {
+	public String readText(String path) {
+		
 		StringBuilder contents = new StringBuilder();
 		try {
 			FileInputStream fis = new FileInputStream(path);
@@ -207,6 +214,7 @@ public class PdfReport {
 			contents = new StringBuilder("N/A");
 			
 			System.err.println("Read " + path + " Fail!");
+			Logger.println("Read " + path + " Fail!");
 		}
 		return contents.toString();
 	}
@@ -216,7 +224,8 @@ public class PdfReport {
 	 * @param document 전체 문서 객체
 	 * @param image 이미지 객체
 	 */
-	public synchronized void setImageSize(Document document, Image image){
+	public void setImageSize(Document document, Image image){
+		
 		float imgHeight = image.getHeight(), imgWidth = image.getWidth();
 	    float docHeight = document.getPageSize().getHeight(), docWidth = document.getPageSize().getWidth();
 	    image.setAlignment(Element.ALIGN_CENTER);
@@ -230,7 +239,8 @@ public class PdfReport {
 	 * 우선 문서를 1차적으로 저장한 뒤, 다시 읽어들여서 각 페이지마다 백그라운드 이미지를 레이어 구조로 삽입
 	 * @param path 원본 문서 이름을 포함한 경로 ex) haniumPdfReport/[20170721] Scouter Report.pdf
 	 */
-	public synchronized void insertStamp(String path) {
+	public void insertStamp(String path) {
+		
 		try {
 			String tmpPath = Util.DATA_PATH + "tmp.pdf";
 			File originFile = new File(path);
@@ -257,17 +267,21 @@ public class PdfReport {
 			tmpFile.renameTo(originFile);
 			
 			System.out.println("Watermark Stamping Success!");
+			Logger.println("Watermark Stamping Success!");
 		}
 		catch(Exception e) {
 			e.printStackTrace();
+			
 			System.err.println("Watermark Stamping Fail!");
+			Logger.println("Watermark Stamping Fail!");
 		}
 	}
 	
 	/**
 	 * 메일 보낸 뒤 PDF파일 및 PDF 파일 생성에 사용됬던 자료들을 삭제하는 메서드
 	 */
-	public synchronized void deleteAllData() {
+	public void deleteAllData() {
+		
 		//DATA_PATH 내부의 모든 파일들을 가져옴
 		File dataPathFile[] = new File(Util.DATA_PATH).listFiles();
 		File renamed = null;
@@ -277,11 +291,13 @@ public class PdfReport {
 			try {
 				fileName = each.getName();
 				
-				renamed = new File(String.format("(OLD)%s", fileName));
-				renamed.createNewFile();
-				
-				each.renameTo(renamed);
-				//each.delete();
+				if(!fileName.contains("(OLD)") && !fileName.endsWith(".pdf")) {
+					renamed = new File(Util.DATA_PATH + String.format("(OLD)%s", fileName));
+					renamed.createNewFile();
+					
+					each.renameTo(renamed);
+					//each.delete();
+				}
 			}
 			catch(Exception e) {
 				e.printStackTrace();
