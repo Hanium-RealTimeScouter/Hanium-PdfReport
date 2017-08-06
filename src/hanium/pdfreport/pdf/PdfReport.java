@@ -32,10 +32,26 @@ public class PdfReport {
 	/* 사용할 폰트 */
 	private static Font kor10, kor10Red, kor15, kor15Red, kor20, kor20Red;
 	
+	/* 싱글톤 패턴 */
+	private static PdfReport instance = null;
+	public static PdfReport getInstance() {
+		if(instance == null) instance = new PdfReport();
+		
+		return instance;
+	}
+	
+	/**
+	 * 싱글톤 패턴을 이용해서 instance를 얻어올 수 있는지 여부
+	 * @return instance가 사용 가능하면 true, 불가능하면 false
+	 */
+	public static boolean isAvailable() {
+		return instance == null;
+	}
+	
 	/**
 	 * 생성자에서 폰트 생성 & 데이터 폴더 생성
 	 */
-	public PdfReport() {
+	private PdfReport() {
 		
 		try {
 			/* 데이터 폴더 없을 시 자동 생성 */
@@ -53,7 +69,7 @@ public class PdfReport {
 		catch(Exception e) {
 			e.printStackTrace();
 
-			e.printStackTrace(Logger.pw());
+			//e.printStackTrace(Logger.pw());
 		}
 	}
 	
@@ -65,9 +81,17 @@ public class PdfReport {
 		
 		boolean isSuccess = true;
 		
+		
+		/* 이미 보고서 파일이 존재하면 중복생성 방지하기 위해 false 리턴 */
+		if(Util.fileExistChecker(Util.REPORT_FILE_PATH)) {
+			return isSuccess = false;
+		}
+		
+		
 		try {
 			/* 기초적인 PDF 생성 */
-			FileOutputStream fos = new FileOutputStream(Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
+			/* /home/haniumPdfReport/[20170806] Scouter Report.pdf */
+			FileOutputStream fos = new FileOutputStream(Util.REPORT_FILE_PATH);
 			Document document = new Document(PageSize.A4, 30, 30, 30, 30);
 			PdfWriter writer = PdfWriter.getInstance(document, fos);
 		    document.open();
@@ -110,7 +134,7 @@ public class PdfReport {
 			fos.close();
 		
 			System.out.println("Document Created!");
-			Logger.println("Document Created at "+ Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
+			//Logger.println("Document Created at "+ Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
 			
 			/* PDF 파일에 워터마크 삽입 */
 			//insertStamp(Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
@@ -120,7 +144,7 @@ public class PdfReport {
 			isSuccess = false;
 			e.printStackTrace();
 			
-			e.printStackTrace(Logger.pw());
+			//e.printStackTrace(Logger.pw());
 		}
 		
 		return isSuccess;
@@ -214,7 +238,7 @@ public class PdfReport {
 			contents = new StringBuilder("N/A");
 			
 			System.err.println("Read " + path + " Fail!");
-			Logger.println("Read " + path + " Fail!");
+			//Logger.println("Read " + path + " Fail!");
 		}
 		return contents.toString();
 	}
@@ -267,13 +291,13 @@ public class PdfReport {
 			tmpFile.renameTo(originFile);
 			
 			System.out.println("Watermark Stamping Success!");
-			Logger.println("Watermark Stamping Success!");
+			//Logger.println("Watermark Stamping Success!");
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 			
 			System.err.println("Watermark Stamping Fail!");
-			Logger.println("Watermark Stamping Fail!");
+			//Logger.println("Watermark Stamping Fail!");
 		}
 	}
 	
@@ -303,5 +327,9 @@ public class PdfReport {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void close() {
+		instance = null;
 	}
 }

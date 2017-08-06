@@ -10,7 +10,6 @@ import org.apache.commons.mail.MultiPartEmail;
 
 import hanium.pdfreport.pdf.PdfReport;
 import hanium.pdfreport.util.Util;
-import scouter.lang.conf.ConfigDesc;
 import scouter.lang.pack.Pack;
 import scouter.lang.plugin.PluginConstants;
 import scouter.lang.plugin.annotation.ServerPlugin;
@@ -23,7 +22,17 @@ public class PdfEmail {
 	
 	private long lastSentTime = -1; //초기값
 	
-	public PdfEmail() {
+	private static PdfEmail instance = null;
+	public static PdfEmail getInstance() {
+		if(instance == null) instance = new PdfEmail();
+		return instance;
+	}
+	
+	public static boolean isAvailable() {
+		return instance == null;
+	}
+	
+	private PdfEmail() {
 		Pack pack = null; //method invoke를 위한 의미없는 Pack 강제 사용
 		sendEmail(pack);
 	}
@@ -44,6 +53,8 @@ public class PdfEmail {
 					@Override
 					public void run() {
 						
+						System.out.println("isAvailable ? "+PdfReport.isAvailable());
+						
 						/* PDF 생성 및 메일 전송 관련
 						 * 1일: 86400000
 						 * 7일: 604800000
@@ -60,14 +71,14 @@ public class PdfEmail {
 
 							////////* 데이터 요청 메서드 콜 삽입 부분*//////////
 							
-							
-							PdfReport pdfReport = new PdfReport();
+							if(PdfReport.isAvailable() == false) return;
+							PdfReport pdfReport = PdfReport.getInstance();
 							
 							boolean createSuccess = pdfReport.createPdfReport();
 							boolean sendEmailSuccess = false;
 							
 							if(createSuccess) {
-								Logger.println("PDF Creation Success!");
+								//Logger.println("PDF Creation Success!");
 								System.out.println("PDF Creation Success!");
 								
 								//String to = "occidere@naver.com, ygh1kr@naver.com, marching0531@naver.com";
@@ -76,26 +87,31 @@ public class PdfEmail {
 								sendEmailSuccess = sendEmail(to, Util.REPORT_FILE_PATH);
 								
 								if(sendEmailSuccess) {
-									Logger.println("Report Email Sent Success!");
+									//Logger.println("Report Email Sent Success!");
 									System.out.println("Report Email Sent Success!");
 									
 									lastSentTime = curTime; //현재 시간으로 마지막 전송 시간을 갱신
 									
 									//pdfReport.deleteAllData(); //PDF 및 생성에 사용됬던 자료들 모두 삭제
 								}
-								else Logger.println("Report Email Sent Fail!");
+								else{
+									System.err.println("Report Email Sent Fail!");
+									//Logger.println("Report Email Sent Fail!");
+								}
 							}
 							else {
-								Logger.println("PDF Creation Fail!");
+								//Logger.println("PDF Creation Fail!");
 								System.out.println("PDF Creation Fail!");
 							}
+							
+							pdfReport.close();
 						}
 					}
 				}.start(); //end of the new Thread()
 			}
 			catch(Throwable t) {
 				t.printStackTrace();
-				t.printStackTrace(Logger.pw());
+				//t.printStackTrace(Logger.pw());
 			}
 		}
 		
@@ -107,7 +123,7 @@ public class PdfEmail {
 	 * @param attachmentPath 첨부할 PDF 파일의 경로
 	 * @return 전송 성공시 true, 실패시 false
 	 */
-	public boolean sendEmail(String to, String attachmentPath) {
+	private boolean sendEmail(String to, String attachmentPath) {
 		MultiPartEmail email = null;
 		EmailAttachment attach = null;
 
@@ -149,17 +165,21 @@ public class PdfEmail {
 	        else {
 	        	sendSuccess = false;
 	        	System.err.println("Attachement was not found!");
-	        	Logger.println("Attachement was not found");
+	        	//Logger.println("Attachement was not found");
 	        }
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 			sendSuccess = false;
 			
-			e.printStackTrace(Logger.pw());
+			//e.printStackTrace(Logger.pw());
 		}
 		
 		return sendSuccess;
+	}
+	
+	public void close() {
+		instance = null;
 	}
 }
 
