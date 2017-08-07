@@ -37,7 +37,7 @@ public class PdfEmail {
 	 * 이것을 호출하면 10초 간격으로 스케쥴링을 하며, 주기에 맞춰 PDF 생성 및 메일 전송을 시도한다.
 	 */
 	@ServerPlugin(PluginConstants.PLUGIN_SERVER_OBJECT)
-	private void sendEmail(Pack pack) { //method invoke를 위한 의미없는 Pack 강제 사용
+	public void sendEmail(Pack pack) { //method invoke를 위한 의미없는 Pack 강제 사용
 		
 		/* PDF 전송이 false면 종료 */
 		if(conf.getBoolean("ext_plugin_email_send_pdf", true)) {
