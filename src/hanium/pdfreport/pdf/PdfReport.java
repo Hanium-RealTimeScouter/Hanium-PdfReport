@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chapter;
@@ -32,26 +33,12 @@ public class PdfReport {
 	/* 사용할 폰트 */
 	private static Font kor10, kor10Red, kor15, kor15Red, kor20, kor20Red;
 	
-	/* 싱글톤 패턴 */
-	private static PdfReport instance = null;
-	public static PdfReport getInstance() {
-		if(instance == null) instance = new PdfReport();
-		
-		return instance;
-	}
-	
-	/**
-	 * 싱글톤 패턴을 이용해서 instance를 얻어올 수 있는지 여부
-	 * @return instance가 사용 가능하면 true, 불가능하면 false
-	 */
-	public static boolean isAvailable() {
-		return instance == null;
-	}
+	public static AtomicInteger ai = new AtomicInteger(0);
 	
 	/**
 	 * 생성자에서 폰트 생성 & 데이터 폴더 생성
 	 */
-	private PdfReport() {
+	public PdfReport() {
 		
 		try {
 			/* 데이터 폴더 없을 시 자동 생성 */
@@ -68,8 +55,7 @@ public class PdfReport {
 		}
 		catch(Exception e) {
 			e.printStackTrace();
-
-			//e.printStackTrace(Logger.pw());
+			e.printStackTrace(Logger.pw());
 		}
 	}
 	
@@ -82,15 +68,24 @@ public class PdfReport {
 		boolean isSuccess = true;
 		
 		
-		/* 이미 보고서 파일이 존재하면 중복생성 방지하기 위해 false 리턴 */
-		if(Util.fileExistChecker(Util.REPORT_FILE_PATH)) {
-			return isSuccess = false;
-		}
+//		/* 이미 보고서 파일이 존재하면 중복생성 방지하기 위해 false 리턴 */
+//		if(Util.fileExistChecker(Util.REPORT_FILE_PATH)) {
+//			return isSuccess = false;
+//		}
+		
+//		/* AtomicInteger 값이 0이 아니면 중복 접근이므로 false
+//		 * 만약 0이었다면 자동으로 1로 바뀐다.
+//		 */
+//		if(ai.compareAndSet(0, 1) == false) {
+//			System.err.println("ai is not 0!");
+//			//Logger.println("AtomicInteger value is not 0");
+//			return false;
+//		}
 		
 		
 		try {
 			/* 기초적인 PDF 생성 */
-			/* /home/haniumPdfReport/[20170806] Scouter Report.pdf */
+			/* /home/haniumPdfReport/[20170807] Scouter Report.pdf */
 			FileOutputStream fos = new FileOutputStream(Util.REPORT_FILE_PATH);
 			Document document = new Document(PageSize.A4, 30, 30, 30, 30);
 			PdfWriter writer = PdfWriter.getInstance(document, fos);
@@ -132,20 +127,23 @@ public class PdfReport {
 			document.close();//문서 닫기
 			writer.close();
 			fos.close();
-		
+			
 			System.out.println("Document Created!");
-			//Logger.println("Document Created at "+ Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
+			Logger.println("Document Created at "+ Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
 			
 			/* PDF 파일에 워터마크 삽입 */
-			//insertStamp(Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
+			insertStamp(Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
 			
 		}
 		catch(Exception e) {
 			isSuccess = false;
 			e.printStackTrace();
-			
-			//e.printStackTrace(Logger.pw());
+			e.printStackTrace(Logger.pw());
 		}
+//		finally {
+//			ai.set(0); //모든 작업 종료 후 다시 0으로 세팅
+//			System.out.println("ai set to 0");
+//		}
 		
 		return isSuccess;
 	}
@@ -238,7 +236,7 @@ public class PdfReport {
 			contents = new StringBuilder("N/A");
 			
 			System.err.println("Read " + path + " Fail!");
-			//Logger.println("Read " + path + " Fail!");
+			Logger.println("Read " + path + " Fail!");
 		}
 		return contents.toString();
 	}
@@ -291,13 +289,13 @@ public class PdfReport {
 			tmpFile.renameTo(originFile);
 			
 			System.out.println("Watermark Stamping Success!");
-			//Logger.println("Watermark Stamping Success!");
+			Logger.println("Watermark Stamping Success!");
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 			
 			System.err.println("Watermark Stamping Fail!");
-			//Logger.println("Watermark Stamping Fail!");
+			Logger.println("Watermark Stamping Fail!");
 		}
 	}
 	
@@ -327,9 +325,5 @@ public class PdfReport {
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	public void close() {
-		instance = null;
 	}
 }

@@ -3,6 +3,7 @@ package scouter.plugin.server.hanium.pdfreport.email;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailAttachment;
@@ -18,23 +19,17 @@ import scouter.server.Logger;
 
 public class PdfEmail {
 	
+	private AtomicInteger ai = new AtomicInteger(0); //스레드 락 전용
+	
 	private final Configure conf = Configure.getInstance();
 	
 	private long lastSentTime = -1; //초기값
 	
-	private static PdfEmail instance = null;
-	public static PdfEmail getInstance() {
-		if(instance == null) instance = new PdfEmail();
-		return instance;
-	}
-	
-	public static boolean isAvailable() {
-		return instance == null;
-	}
-	
-	private PdfEmail() {
-		Pack pack = null; //method invoke를 위한 의미없는 Pack 강제 사용
-		sendEmail(pack);
+	/**
+	 * 외부 호출용 메서드
+	 */
+	public void sendEmail() {
+		sendEmail(null); //Pack 은 어차피 안쓰이므로 의미없는 null을 채워넣는다.
 	}
 	
 	/**
@@ -42,7 +37,7 @@ public class PdfEmail {
 	 * 이것을 호출하면 10초 간격으로 스케쥴링을 하며, 주기에 맞춰 PDF 생성 및 메일 전송을 시도한다.
 	 */
 	@ServerPlugin(PluginConstants.PLUGIN_SERVER_OBJECT)
-	public void sendEmail(Pack pack) { //method invoke를 위한 의미없는 Pack 강제 사용
+	private void sendEmail(Pack pack) { //method invoke를 위한 의미없는 Pack 강제 사용
 		
 		/* PDF 전송이 false면 종료 */
 		if(conf.getBoolean("ext_plugin_email_send_pdf", true)) {
@@ -52,8 +47,6 @@ public class PdfEmail {
 					
 					@Override
 					public void run() {
-						
-						System.out.println("isAvailable ? "+PdfReport.isAvailable());
 						
 						/* PDF 생성 및 메일 전송 관련
 						 * 1일: 86400000
@@ -68,18 +61,27 @@ public class PdfEmail {
 						/* 마지막 전송 시간으로부터 전송 주기만큼 지났으면 pdf 생성 및 전송 */
 						if(lastSentTime<0 || elapsedTime >= lastSentTime) {
 							
-
-							////////* 데이터 요청 메서드 콜 삽입 부분*//////////
+							/* AtomicInteger 값이 0이 아니면 중복 접근이므로 false
+							 * 만약 0이었다면 자동으로 1로 바뀐다.
+							 */
+							if(ai.compareAndSet(0, 1) == false) {
+								System.err.println("AtomicInteger value is not 0!");
+								Logger.println("AtomicInteger value is not 0!");
+								return;
+							}
 							
-							if(PdfReport.isAvailable() == false) return;
-							PdfReport pdfReport = PdfReport.getInstance();
+
+							/******* 데이터 요청 메서드 콜을 이 라인에 삽입 *******/
+							
+							
+							PdfReport pdfReport = new PdfReport();
 							
 							boolean createSuccess = pdfReport.createPdfReport();
 							boolean sendEmailSuccess = false;
 							
 							if(createSuccess) {
-								//Logger.println("PDF Creation Success!");
 								System.out.println("PDF Creation Success!");
+								Logger.println("PDF Creation Success!");
 								
 								//String to = "occidere@naver.com, ygh1kr@naver.com, marching0531@naver.com";
 								String to = "occidere@naver.com";
@@ -87,8 +89,8 @@ public class PdfEmail {
 								sendEmailSuccess = sendEmail(to, Util.REPORT_FILE_PATH);
 								
 								if(sendEmailSuccess) {
-									//Logger.println("Report Email Sent Success!");
 									System.out.println("Report Email Sent Success!");
+									Logger.println("Report Email Sent Success!");
 									
 									lastSentTime = curTime; //현재 시간으로 마지막 전송 시간을 갱신
 									
@@ -96,25 +98,24 @@ public class PdfEmail {
 								}
 								else{
 									System.err.println("Report Email Sent Fail!");
-									//Logger.println("Report Email Sent Fail!");
+									Logger.println("Report Email Sent Fail!");
 								}
 							}
 							else {
-								//Logger.println("PDF Creation Fail!");
 								System.out.println("PDF Creation Fail!");
+								Logger.println("PDF Creation Fail!");
 							}
 							
-							pdfReport.close();
+							ai.set(0); //모든 작업 종료 뒤 0으로 초기화
 						}
 					}
 				}.start(); //end of the new Thread()
 			}
 			catch(Throwable t) {
 				t.printStackTrace();
-				//t.printStackTrace(Logger.pw());
+				t.printStackTrace(Logger.pw());
 			}
 		}
-		
 	}
 	
 	/**
@@ -163,23 +164,17 @@ public class PdfEmail {
 		        email.send();
 	        }
 	        else {
-	        	sendSuccess = false;
 	        	System.err.println("Attachement was not found!");
-	        	//Logger.println("Attachement was not found");
+	        	Logger.println("Attachement was not found");
+	        	sendSuccess = false;
 	        }
 		}
 		catch(Exception e) {
 			e.printStackTrace();
+			e.printStackTrace(Logger.pw());
 			sendSuccess = false;
-			
-			//e.printStackTrace(Logger.pw());
 		}
 		
 		return sendSuccess;
 	}
-	
-	public void close() {
-		instance = null;
-	}
 }
-

@@ -5,13 +5,8 @@ public class Main {
 	
 	/* Main.java is just test class for local environment */
 	public static void main(String[] args) {
-		
-		Util.CUR_PATH = "C:\\Users\\occid\\workspace\\Hanium-PdfReport\\";
-		PdfEmail p = null;
-		if(PdfEmail.isAvailable()) {
-			p = PdfEmail.getInstance();
-			p.sendEmail(null);
-			p.close();
-		}
+		//Util.CUR_PATH = "C:\\Users\\occid\\workspace\\Hanium-PdfReport\\";
+		PdfEmail p = new PdfEmail();
+		p.sendEmail();
 	}
 }
