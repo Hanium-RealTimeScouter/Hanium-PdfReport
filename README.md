@@ -21,3 +21,9 @@ SCOUTER는 오픈소스 APM 도구로서 Java, WAS에 대한 모니터링 모니
  -  추후에 보고서에 추가 될 내용(TOBE)
    - Thread 분석(Thread가 생성되어 사라지는 시간을 시각화하여 Thread의 Dead Lock현상등을 발견 할 수 있게 한다.)
 
+
+
+
+## VERSION INFO
+ - VER 1.2.1 (BUILD 20170819)
+  - Added Email receiver properties(i.e. ext_plugin_email_pdf_address=occidere@naver.com, address@gmail.com)

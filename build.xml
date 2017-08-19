@@ -10,10 +10,13 @@
 	<!-- Hanium PDF Report Modules library -->
 	<property name="jar-itext5pdf-file" value="./lib/itext5-itextpdf-5.5.11.jar"/>
 	<property name="jar-itext5xmlworker-file" value="./lib/itext5-xmlworker-5.5.11.jar"/>
+	
+	<!-- Version Information -->
+	<property name="info.version" value="1.2.1"/>
 
 	<target name="packaging">
 		<mkdir dir="${dir.target.jar}" />
-		<jar destfile="${dir.target.jar}/scouter-plugin-server-alert-pdf-email.jar">
+		<jar destfile="${dir.target.jar}/scouter-plugin-server-alert-pdf-email-${info.version}.jar">
 			<fileset dir="${dir.classes}"/>
 		</jar>
 		<copy file="${jar-activation-file}" todir="${dir.target.jar}" verbose="true" />

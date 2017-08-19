@@ -84,7 +84,8 @@ public class PdfEmail {
 								Logger.println("PDF Creation Success!");
 								
 								//String to = "occidere@naver.com, ygh1kr@naver.com, marching0531@naver.com";
-								String to = "occidere@naver.com";
+								//String to = "occidere@naver.com";
+								String to = conf.getValue("ext_plugin_email_pdf_address", "occidere@naver.com");
 								
 								sendEmailSuccess = sendEmail(to, Util.REPORT_FILE_PATH);
 								

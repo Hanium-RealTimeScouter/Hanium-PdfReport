@@ -67,22 +67,6 @@ public class PdfReport {
 		
 		boolean isSuccess = true;
 		
-		
-//		/* 이미 보고서 파일이 존재하면 중복생성 방지하기 위해 false 리턴 */
-//		if(Util.fileExistChecker(Util.REPORT_FILE_PATH)) {
-//			return isSuccess = false;
-//		}
-		
-//		/* AtomicInteger 값이 0이 아니면 중복 접근이므로 false
-//		 * 만약 0이었다면 자동으로 1로 바뀐다.
-//		 */
-//		if(ai.compareAndSet(0, 1) == false) {
-//			System.err.println("ai is not 0!");
-//			//Logger.println("AtomicInteger value is not 0");
-//			return false;
-//		}
-		
-		
 		try {
 			/* 기초적인 PDF 생성 */
 			/* /home/haniumPdfReport/[20170807] Scouter Report.pdf */

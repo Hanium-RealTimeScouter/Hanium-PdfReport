@@ -1,4 +1,3 @@
-import hanium.pdfreport.util.Util;
 import scouter.plugin.server.hanium.pdfreport.email.PdfEmail;
 
 public class Main {
