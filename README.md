@@ -26,4 +26,4 @@ SCOUTER는 오픈소스 APM 도구로서 Java, WAS에 대한 모니터링 모니
 
 ## VERSION INFO
  - VER 1.2.1 (BUILD 20170819)
-  - Added Email receiver properties(i.e. ext_plugin_email_pdf_address=occidere@naver.com, address@gmail.com)
+    - Added Email receiver properties(i.e. ext_plugin_email_pdf_address=occidere@naver.com, address@gmail.com)
