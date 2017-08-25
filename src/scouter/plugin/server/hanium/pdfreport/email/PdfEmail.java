@@ -10,7 +10,6 @@ import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.MultiPartEmail;
 
 import hanium.pdfreport.pdf.PdfReport;
-import hanium.pdfreport.util.Util;
 import scouter.lang.pack.Pack;
 import scouter.lang.plugin.PluginConstants;
 import scouter.lang.plugin.annotation.ServerPlugin;
@@ -53,7 +52,7 @@ public class PdfEmail {
 						 * 7일: 604800000
 						 * 30일: 2592000000
 						 */
-						long sendPeriod = conf.getLong("ext_plugin_email_send_pdf_period", 86400000);
+						long sendPeriod = conf.getLong("ext_plugin_email_send_pdf_period", 86400000); //디폴트: 하루
 						
 						long curTime = System.currentTimeMillis();
 						long elapsedTime = curTime - sendPeriod;
@@ -71,7 +70,7 @@ public class PdfEmail {
 							}
 							
 
-							/******* 데이터 요청 메서드 콜을 이 라인에 삽입 *******/
+							/******* 데이터 요청 메서드 콜을 이 라인에 삽입할 것 *******/
 							
 							
 							PdfReport pdfReport = new PdfReport();
@@ -83,11 +82,11 @@ public class PdfEmail {
 								System.out.println("PDF Creation Success!");
 								Logger.println("PDF Creation Success!");
 								
-								//String to = "occidere@naver.com, ygh1kr@naver.com, marching0531@naver.com";
-								//String to = "occidere@naver.com";
-								String to = conf.getValue("ext_plugin_email_pdf_address", "occidere@naver.com");
+								String attachementPath = pdfReport.getReportFilePath();
+								String receivers = "occidere@naver.com, ygh1kr@naver.com, marching0531@naver.com";
+								String to = conf.getValue("ext_plugin_email_pdf_address", receivers);
 								
-								sendEmailSuccess = sendEmail(to, Util.REPORT_FILE_PATH);
+								sendEmailSuccess = sendEmail(to, attachementPath);
 								
 								if(sendEmailSuccess) {
 									System.out.println("Report Email Sent Success!");

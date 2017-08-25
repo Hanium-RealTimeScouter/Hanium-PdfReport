@@ -12,7 +12,7 @@
 	<property name="jar-itext5xmlworker-file" value="./lib/itext5-xmlworker-5.5.11.jar"/>
 	
 	<!-- Version Information -->
-	<property name="info.version" value="1.2.1"/>
+	<property name="info.version" value="1.2.3"/>
 
 	<target name="packaging">
 		<mkdir dir="${dir.target.jar}" />

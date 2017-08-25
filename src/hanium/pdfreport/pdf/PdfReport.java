@@ -31,7 +31,11 @@ import com.itextpdf.text.Image;
 
 public class PdfReport {
 	/* 사용할 폰트 */
+	@SuppressWarnings("unused")
 	private static Font kor10, kor10Red, kor15, kor15Red, kor20, kor20Red;
+	
+	/* 기존 Util 클래스에 상수로 써놓으니까 갱신이 안되서 보고서 클래스로 이동 */
+	private String reportName, reportFilePath;
 	
 	public static AtomicInteger ai = new AtomicInteger(0);
 	
@@ -39,7 +43,6 @@ public class PdfReport {
 	 * 생성자에서 폰트 생성 & 데이터 폴더 생성
 	 */
 	public PdfReport() {
-		
 		try {
 			/* 데이터 폴더 없을 시 자동 생성 */
 			new File(Util.DATA_PATH).mkdirs();
@@ -64,13 +67,16 @@ public class PdfReport {
 	 * @return 생성 성공시 true, 실패시 false
 	 */
 	public synchronized boolean createPdfReport() {
+		/* 보고서 이름 PDF 생성 시 마다 초기화 */
+		reportName = new SimpleDateFormat("[yyyyMMdd]").format(new Date()) + " Scouter Report";
+		reportFilePath = Util.DATA_PATH + reportName + ".pdf";
 		
 		boolean isSuccess = true;
 		
 		try {
 			/* 기초적인 PDF 생성 */
-			/* /home/haniumPdfReport/[20170807] Scouter Report.pdf */
-			FileOutputStream fos = new FileOutputStream(Util.REPORT_FILE_PATH);
+			/* /home/haniumPdfReport/[20170825] Scouter Report.pdf */
+			FileOutputStream fos = new FileOutputStream(reportFilePath);
 			Document document = new Document(PageSize.A4, 30, 30, 30, 30);
 			PdfWriter writer = PdfWriter.getInstance(document, fos);
 		    document.open();
@@ -79,7 +85,7 @@ public class PdfReport {
 		    document.addCreator("creator_occidere");
 		    document.addTitle("Hanium Scouter Project");
 		    
-		    Paragraph title = new Paragraph("한이음 스카우터 PDF 보고서\n" + Util.REPORT_NAME + "\n", kor20Red);
+		    Paragraph title = new Paragraph("한이음 스카우터 PDF 보고서\n" + reportName + "\n", kor20Red);
 		    title.setAlignment(Element.ALIGN_CENTER); //가운데정렬
 		    document.add(title);
 
@@ -113,10 +119,10 @@ public class PdfReport {
 			fos.close();
 			
 			System.out.println("Document Created!");
-			Logger.println("Document Created at "+ Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
+			Logger.println("Document Created at "+ Util.DATA_PATH + reportName + ".pdf");
 			
 			/* PDF 파일에 워터마크 삽입 */
-			insertStamp(Util.DATA_PATH + Util.REPORT_NAME + ".pdf");
+			insertStamp(Util.DATA_PATH + reportName + ".pdf");
 			
 		}
 		catch(Exception e) {
@@ -124,10 +130,6 @@ public class PdfReport {
 			e.printStackTrace();
 			e.printStackTrace(Logger.pw());
 		}
-//		finally {
-//			ai.set(0); //모든 작업 종료 후 다시 0으로 세팅
-//			System.out.println("ai set to 0");
-//		}
 		
 		return isSuccess;
 	}
@@ -147,7 +149,6 @@ public class PdfReport {
 	 * @throws Exception
 	 */
 	public Chapter makeChapter(Document document, int chapterNum) throws Exception {
-		
 		String title = null, text = null;
 		Image image = null;
 
@@ -178,7 +179,6 @@ public class PdfReport {
 	 * @throws Exception
 	 */
 	public Chapter makeChapter(Document document, int chapterNum, String title, Image image, String text) throws Exception {
-		
 		Chapter chapter = null;
 		
 		/* 챕터 삽입 */
@@ -190,7 +190,6 @@ public class PdfReport {
 			setImageSize(document, image);
 			chapter.add(image);
 		}
-		
 		chapter.add(new Paragraph(text, kor10)); //부연설명 삽입
 		
 		return chapter;
@@ -216,8 +215,8 @@ public class PdfReport {
 			System.out.println("Read " + path + " Success!");
 		}
 		catch(Exception e) {
+			contents = new StringBuilder(""); //txt 파일 읽기 실패 시 공백("") 삽입
 			e.printStackTrace();
-			contents = new StringBuilder("N/A");
 			
 			System.err.println("Read " + path + " Fail!");
 			Logger.println("Read " + path + " Fail!");
@@ -231,10 +230,11 @@ public class PdfReport {
 	 * @param image 이미지 객체
 	 */
 	public void setImageSize(Document document, Image image){
-		
 		float imgHeight = image.getHeight(), imgWidth = image.getWidth();
 	    float docHeight = document.getPageSize().getHeight(), docWidth = document.getPageSize().getWidth();
+	    
 	    image.setAlignment(Element.ALIGN_CENTER);
+	    
 	    if(imgHeight > docHeight || imgWidth > docWidth){
 	    	image.scaleToFit(document.getPageSize());
 	    }
@@ -246,7 +246,6 @@ public class PdfReport {
 	 * @param path 원본 문서 이름을 포함한 경로 ex) haniumPdfReport/[20170721] Scouter Report.pdf
 	 */
 	public void insertStamp(String path) {
-		
 		try {
 			String tmpPath = Util.DATA_PATH + "tmp.pdf";
 			File originFile = new File(path);
@@ -254,13 +253,19 @@ public class PdfReport {
 
 			PdfReader pdfReader = new PdfReader(path);
 			PdfStamper pdfStamper = new PdfStamper(pdfReader, new FileOutputStream(tmpFile));
-			
 			Image image = Image.getInstance(Util.DATA_PATH + "stamp.png");
+			
 			for(int i=1;i<=pdfReader.getNumberOfPages();i++){
 				image.scalePercent(50F);
-				image.setAbsolutePosition(PageSize.A4.getWidth()/2 - image.getWidth()/4, 
-						PageSize.A4.getHeight()/2 - image.getHeight()/4); //절대값 위치 필수
+				
+				/* 절대값 위치 필수 */
+				image.setAbsolutePosition(
+						PageSize.A4.getWidth()/2 - image.getWidth()/4, 
+						PageSize.A4.getHeight()/2 - image.getHeight()/4
+						);
+				
 				//setImageSize(document, image);
+				
 				image.setAlignment(Element.ALIGN_MIDDLE);
 				PdfContentByte content = pdfStamper.getOverContent(i);
 				content.addImage(image);
@@ -301,13 +306,17 @@ public class PdfReport {
 					renamed = new File(Util.DATA_PATH + String.format("(OLD)%s", fileName));
 					renamed.createNewFile();
 					
-					each.renameTo(renamed);
-					//each.delete();
+					each.renameTo(renamed); //이름만 변경
+					//each.delete(); //아예 삭제
 				}
 			}
 			catch(Exception e) {
-				e.printStackTrace();
+				e.printStackTrace(Logger.pw());
 			}
 		}
+	}
+	
+	public String getReportFilePath() {
+		return reportFilePath;
 	}
 }
